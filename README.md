@@ -20,3 +20,9 @@ glassoFast = 1.0.1
 In addition, We strongly recommend you to install the pcalg we provided in the Github repository, as we have revise some of the functions provided in the orignal package.
 
 If you are interested in the simulation part, you can refer to this repository for full details: https://github.com/LiangyingYin/BN-GWAS-Simulation
+
+Installation: 
+```r
+library(devtools)
+install_github("LiangyingYin/BN-GWAS")
+```

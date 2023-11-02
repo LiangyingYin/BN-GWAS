@@ -1,0 +1,140 @@
+---
+title: "Tutorial for BNGWAS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tutorial for BNGWAS}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r}
+set.seed(123)
+
+library(BNGWAS)
+library(data.table)
+```
+
+We strongly recommend you to install the `pcalg` we provided in the Github repository, as we have revise some of the functions provided in the orignal package.<br>
+
+### Tutorial for study gene-gene causal network 
+
+We use `get_Glasso_Graph()` as a prescreening tool to identify fix gaps between variables. We employ PC algorithm to infer the gene-gene causal networks by `get_Bayesian_Network()` function.<br> 
+
+It conditions on all possible combinations of all variables, excluding the identified fixed gaps. By using `glasso_obj` derived from the `get_Glasso_Graph()` function, we could significantly
+improve the computational efficiency of the PC algorithm(i.e., `get_Bayesian_Network()` function), especially in high dimensional settings.<br> 
+
+```{r}
+resid_mat <- fread("./example_resid_mat.csv")
+n.cores <- 15
+glasso_obj <- get_Glasso_Graph(resid_mat,n.cores)
+
+alpha <- 0.05
+numCores <- 15
+m.max <- 3
+pc_obj <- get_Bayesian_Network(alpha,numCores,m.max,resid_mat,glasso_obj)
+print("Finished studying the gene-gene causal network")
+```
+
+### Tutorial for study gene-outcome causal network 
+
+We use PC-simple algorithm(i.e., `get_gene_single_outcome_network()` and `get_gene_multiple_outcome_network()`) to infer the gene-outcome causal network. It focuses solely on inferring the causal
+relationships between covariates and a single target variable. Considering this, we directly used this method to infer the causal relationships between covariates and targets without prescreening.<br> 
+
+`get_gene_single_outcome_network()` and `get_gene_multiple_outcome_network()` are respectively developed to infer the gene-outcoem causal network for single and multiple outcomes.<br>   
+
+```{r}
+expr <- fread("./demo_expr.csv")
+pheno<- fread("./demo_pheno.csv")
+PCs<- fread("./demo_PCs.csv")
+predicted_pheno <- fread("./demo_predicted_pheno.csv")
+num_workers <- 10
+outcome_name<-"BMI"
+pcSimple.fit <- get_gene_single_outcome_network(outcome_name,expr,pheno,PCs,alpha,num_workers)
+pcSimple.fit.multiple <- get_gene_multiple_outcome_network(outcome_name,expr,pheno,predicted_pheno,PCs,alpha,num_workers)
+print("Finished studying the gene-outcome causal network")
+```
+
+### Tutorial for merging gene-gene graph and gene-outcome graph into a whole graph
+
+We can get the whole gene-gene-outcome causal network by merging the estimated gene-gene and gene-outcome causal networks(using `merge_causal_graphs()` function). Make sure the gene_graph_adj(gene-gene)
+and gene_to_outcome adjacency vector are for the variables in the same orders.<br>
+e.g.,<br>
+gene_graph_adj(3*3):<br>
+
+|       |  g1   |  g2   |  g3   |
+| :---: | :---: | :---: | :---: |
+| g1    |  0    |  0    |  1    |
+| g2    |  1    |  0    |  0    |
+| g3    |  0    |  0    |  0    |
+
+gene_to_outcome(3*1):<br>
+
+|       |  p    |
+| :---: | :---: | 
+| g1    |  1    |  
+| g2    |  1    | 
+| g3    |  0    |  
+
+With the whole causal graph and the estimated covariance matrix, we can estimate the total and direct causal effects of variables on the target variable using `Get_IDA_and_jointIDA()` function.<br>
+We propose to use the derived pvalue matrix derived from the estimated causal graph to penalize the estimated covariance matrix. Two penalization strategies are proposed, i.e., p-value adjustment and iterative
+p-value adjustment. 
+
+```{r}
+pc_graph_adj <- pc_obj@graph
+gene_graph_adj <- as(pc_graph_adj, "matrix")
+
+genes_names <- names(pcSimple.fit$G)
+assoc <- as.vector(unlist(pcSimple.fit$G))
+zMin <- as.vector(unlist(pcSimple.fit$zMin))
+gene_outcome_network <- as.data.frame(cbind(genes_names,assoc,zMin))
+gene_to_outcome <-rep(0,length(assoc))
+assoc_index <- which(gene_outcome_network$assoc==TRUE)
+gene_to_outcome[assoc_index] <- 1
+bgadd2 <- merge_causal_graphs(gene_graph_adj,gene_to_outcome)
+
+outcome <- pheno
+genes_trait <- inner_join(expr,outcome, by="FID")
+gene_trait_valid <- genes_trait[,-1]
+cat("The sample size is",nrow(gene_trait_valid),"\n")
+cov_mat <- cov(gene_trait_valid)
+target_genes <- colnames(expr)[-1]
+
+pheno_num <- 1
+gene_num <- length(gene_to_outcome)
+rho_pMax_len <- gene_num + pheno_num
+rho_pMax <- matrix(0,nrow= rho_pMax_len,ncol=rho_pMax_len)
+
+# Get rho_pMax matrix for the overall causal graph
+rho_pMax_gene <- pc_obj@pMax ##extract pMax matrix for gene-gene causal network
+graph_estimate <- pc_obj@graph ## extract the inferred gene-gene causal graph
+adj_temp <- as(graph_estimate,"matrix") ##convert the inferred gene-gene causal graph to adjacency matrix
+rho_pMax_gene[which(rho_pMax_gene<alpha & adj_temp ==0)] = 1  
+
+rho_pMax_gene_outcome <- 2 * pnorm(-abs(as.numeric(as.vector(unlist(gene_outcome_network$zMin))))) ##convert zMin for gene-outcome causal network to pvalues
+rho_pMax[1:gene_num,1:gene_num] <- rho_pMax_gene # 
+rho_pMax[,rho_pMax_len] <- c(rho_pMax_gene_outcome,-1)
+rho_pMax[rho_pMax_len,] <- c(rho_pMax_gene_outcome,-1)
+diag(rho_pMax) <- 0
+rho_pMax[rho_pMax==-1] <- 1
+
+estimateMatrix <- bgadd2  
+estimateMatrix <- t(estimateMatrix) ## to make bgadd2 consistent with the graph derived from GTEx
+rownames(estimateMatrix) <- seq(1,rho_pMax_len)
+colnames(estimateMatrix) <- seq(1,rho_pMax_len)
+# Convert the combined graph as a grahNEL object
+graph.fit <- as(estimateMatrix, "graphNEL")
+#convert format of the graph that have negative edges
+estimateGraph <- graph.adjacency(estimateMatrix, mode="directed", weighted=TRUE)
+estimateGraph <- igraph.to.graphNEL(estimateGraph)
+Effects_mat_final <- Get_IDA_and_jointIDA(estimateGraph,cov_mat,target_genes)
+
+cov_adjusted <- get_pvalue_adjusted_cov(rho_pMax,cov_mat)
+Effects_mat_pval_adjusted_final <- Get_IDA_and_jointIDA(estimateGraph,cov_adjusted,target_genes)
+
+iterateNum <-20 # maximum iteration number
+thres <- 1e-04 # threshold used to determine whether the penalizaiton converged
+n <- nrow(gene_trait_valid)
+cov_iterative_adjust <- get_iterative_pvalue_adjusted_cov(rho_pMax,cov_mat,iterateNum,thres,n)
+print("Finished merging the gene-gene and gene-outcome causal network")
+```
+

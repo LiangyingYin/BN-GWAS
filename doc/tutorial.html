@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Tutorial for BNGWAS</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Tutorial for BNGWAS</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(BNGWAS)</span></code></pre></div>
+<pre><code>## Loading required package: glassoFast</code></pre>
+<pre><code>## Loading required package: glasso</code></pre>
+<pre><code>## Loading required package: dplyr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre><code>## Loading required package: igraph</code></pre>
+<pre><code>## 
+## Attaching package: &#39;igraph&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     as_data_frame, groups, union</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     decompose, spectrum</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     union</code></pre>
+<pre><code>## Loading required package: graph</code></pre>
+<pre><code>## Loading required package: BiocGenerics</code></pre>
+<pre><code>## 
+## Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:igraph&#39;:
+## 
+##     normalize, path, union</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     combine, intersect, setdiff, union</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+##     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+##     get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+##     match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+##     Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+##     table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
+<pre><code>## 
+## Attaching package: &#39;graph&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:igraph&#39;:
+## 
+##     degree, edges, intersection</code></pre>
+<pre><code>## Loading required package: coop</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## Loading required package: pcalg</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;data.table&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     between, first, last</code></pre>
+<p>We strongly recommend you to install the <code>pcalg</code> we
+provided in the Github repository, as we have revise some of the
+functions provided in the orignal package.<br></p>
+<div id="tutorial-for-study-gene-gene-causal-network" class="section level3">
+<h3>Tutorial for study gene-gene causal network</h3>
+<p>We use <code>get_Glasso_Graph()</code> as a prescreening tool to
+identify fix gaps between variables. We employ PC algorithm to infer the
+gene-gene causal networks by <code>get_Bayesian_Network()</code>
+function.<br></p>
+<p>It conditions on all possible combinations of all variables,
+excluding the identified fixed gaps. By using <code>glasso_obj</code>
+derived from the <code>get_Glasso_Graph()</code> function, we could
+significantly improve the computational efficiency of the PC
+algorithm(i.e., <code>get_Bayesian_Network()</code> function),
+especially in high dimensional settings.<br></p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>resid_mat <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">&quot;./example_resid_mat.csv&quot;</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>n.cores <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a>glasso_obj <span class="ot">&lt;-</span> <span class="fu">get_Glasso_Graph</span>(resid_mat,n.cores)</span></code></pre></div>
+<pre><code>## [1] 0.1108815</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>numCores <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>m.max <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a>pc_obj <span class="ot">&lt;-</span> <span class="fu">get_Bayesian_Network</span>(alpha,numCores,m.max,resid_mat,glasso_obj)</span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Finished studying the gene-gene causal network&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;Finished studying the gene-gene causal network&quot;</code></pre>
+</div>
+<div id="tutorial-for-study-gene-outcome-causal-network" class="section level3">
+<h3>Tutorial for study gene-outcome causal network</h3>
+<p>We use PC-simple algorithm(i.e.,
+<code>get_gene_single_outcome_network()</code> and
+<code>get_gene_multiple_outcome_network()</code>) to infer the
+gene-outcome causal network. It focuses solely on inferring the causal
+relationships between covariates and a single target variable.
+Considering this, we directly used this method to infer the causal
+relationships between covariates and targets without
+prescreening.<br></p>
+<p><code>get_gene_single_outcome_network()</code> and
+<code>get_gene_multiple_outcome_network()</code> are respectively
+developed to infer the gene-outcoem causal network for single and
+multiple outcomes.<br></p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>expr <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">&quot;./demo_expr.csv&quot;</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>pheno<span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">&quot;./demo_pheno.csv&quot;</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a>PCs<span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">&quot;./demo_PCs.csv&quot;</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a>predicted_pheno <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">&quot;./demo_predicted_pheno.csv&quot;</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" tabindex="-1"></a>num_workers <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb33-6"><a href="#cb33-6" tabindex="-1"></a>outcome_name<span class="ot">&lt;-</span><span class="st">&quot;BMI&quot;</span></span>
+<span id="cb33-7"><a href="#cb33-7" tabindex="-1"></a>pcSimple.fit <span class="ot">&lt;-</span> <span class="fu">get_gene_single_outcome_network</span>(outcome_name,expr,pheno,PCs,alpha,num_workers)</span></code></pre></div>
+<pre><code>## [1] 2000  151
+## Order=0; remaining edges:149
+## Order=1; remaining edges:14
+## Order=2; remaining edges:10
+## Order=3; remaining edges:8</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a>pcSimple.fit.multiple <span class="ot">&lt;-</span> <span class="fu">get_gene_multiple_outcome_network</span>(outcome_name,expr,pheno,predicted_pheno,PCs,alpha,num_workers)</span></code></pre></div>
+<pre><code>## [1] 1953  152
+## Order=0; remaining edges:150
+## Order=1; remaining edges:12
+## Order=2; remaining edges:9
+## Order=3; remaining edges:8</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Finished studying the gene-outcome causal network&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;Finished studying the gene-outcome causal network&quot;</code></pre>
+</div>
+<div id="tutorial-for-merging-gene-gene-graph-and-gene-outcome-graph-into-a-whole-graph" class="section level3">
+<h3>Tutorial for merging gene-gene graph and gene-outcome graph into a
+whole graph</h3>
+<p>We can get the whole gene-gene-outcome causal network by merging the
+estimated gene-gene and gene-outcome causal networks(using
+<code>merge_causal_graphs()</code> function). Make sure the
+gene_graph_adj(gene-gene) and gene_to_outcome adjacency vector are for
+the variables in the same orders.<br> e.g.,<br>
+gene_graph_adj(3*3):<br></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center"></th>
+<th align="center">g1</th>
+<th align="center">g2</th>
+<th align="center">g3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">g1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">g2</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">g3</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table>
+<p>gene_to_outcome(3*1):<br></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center"></th>
+<th align="center">p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">g1</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">g2</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">g3</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table>
+<p>With the whole causal graph and the estimated covariance matrix, we
+can estimate the total and direct causal effects of variables on the
+target variable using <code>Get_IDA_and_jointIDA()</code> function.<br>
+We propose to use the derived pvalue matrix derived from the estimated
+causal graph to penalize the estimated covariance matrix. Two
+penalization strategies are proposed, i.e., p-value adjustment and
+iterative p-value adjustment.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a>pc_graph_adj <span class="ot">&lt;-</span> pc_obj<span class="sc">@</span>graph</span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>gene_graph_adj <span class="ot">&lt;-</span> <span class="fu">as</span>(pc_graph_adj, <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a>genes_names <span class="ot">&lt;-</span> <span class="fu">names</span>(pcSimple.fit<span class="sc">$</span>G)</span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>assoc <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">unlist</span>(pcSimple.fit<span class="sc">$</span>G))</span>
+<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a>zMin <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">unlist</span>(pcSimple.fit<span class="sc">$</span>zMin))</span>
+<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a>gene_outcome_network <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">cbind</span>(genes_names,assoc,zMin))</span>
+<span id="cb39-8"><a href="#cb39-8" tabindex="-1"></a>gene_to_outcome <span class="ot">&lt;-</span><span class="fu">rep</span>(<span class="dv">0</span>,<span class="fu">length</span>(assoc))</span>
+<span id="cb39-9"><a href="#cb39-9" tabindex="-1"></a>assoc_index <span class="ot">&lt;-</span> <span class="fu">which</span>(gene_outcome_network<span class="sc">$</span>assoc<span class="sc">==</span><span class="cn">TRUE</span>)</span>
+<span id="cb39-10"><a href="#cb39-10" tabindex="-1"></a>gene_to_outcome[assoc_index] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb39-11"><a href="#cb39-11" tabindex="-1"></a>bgadd2 <span class="ot">&lt;-</span> <span class="fu">merge_causal_graphs</span>(gene_graph_adj,gene_to_outcome)</span>
+<span id="cb39-12"><a href="#cb39-12" tabindex="-1"></a></span>
+<span id="cb39-13"><a href="#cb39-13" tabindex="-1"></a>outcome <span class="ot">&lt;-</span> pheno</span>
+<span id="cb39-14"><a href="#cb39-14" tabindex="-1"></a>genes_trait <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(expr,outcome, <span class="at">by=</span><span class="st">&quot;FID&quot;</span>)</span>
+<span id="cb39-15"><a href="#cb39-15" tabindex="-1"></a>gene_trait_valid <span class="ot">&lt;-</span> genes_trait[,<span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb39-16"><a href="#cb39-16" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;The sample size is&quot;</span>,<span class="fu">nrow</span>(gene_trait_valid),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## The sample size is 2000</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a>cov_mat <span class="ot">&lt;-</span> <span class="fu">cov</span>(gene_trait_valid)</span>
+<span id="cb41-2"><a href="#cb41-2" tabindex="-1"></a>target_genes <span class="ot">&lt;-</span> <span class="fu">colnames</span>(expr)[<span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb41-3"><a href="#cb41-3" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" tabindex="-1"></a>pheno_num <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb41-5"><a href="#cb41-5" tabindex="-1"></a>gene_num <span class="ot">&lt;-</span> <span class="fu">length</span>(gene_to_outcome)</span>
+<span id="cb41-6"><a href="#cb41-6" tabindex="-1"></a>rho_pMax_len <span class="ot">&lt;-</span> gene_num <span class="sc">+</span> pheno_num</span>
+<span id="cb41-7"><a href="#cb41-7" tabindex="-1"></a>rho_pMax <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="at">nrow=</span> rho_pMax_len,<span class="at">ncol=</span>rho_pMax_len)</span>
+<span id="cb41-8"><a href="#cb41-8" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" tabindex="-1"></a><span class="co"># Get rho_pMax matrix for the overall causal graph</span></span>
+<span id="cb41-10"><a href="#cb41-10" tabindex="-1"></a>rho_pMax_gene <span class="ot">&lt;-</span> pc_obj<span class="sc">@</span>pMax <span class="do">##extract pMax matrix for gene-gene causal network</span></span>
+<span id="cb41-11"><a href="#cb41-11" tabindex="-1"></a>graph_estimate <span class="ot">&lt;-</span> pc_obj<span class="sc">@</span>graph <span class="do">## extract the inferred gene-gene causal graph</span></span>
+<span id="cb41-12"><a href="#cb41-12" tabindex="-1"></a>adj_temp <span class="ot">&lt;-</span> <span class="fu">as</span>(graph_estimate,<span class="st">&quot;matrix&quot;</span>) <span class="do">##convert the inferred gene-gene causal graph to adjacency matrix</span></span>
+<span id="cb41-13"><a href="#cb41-13" tabindex="-1"></a>rho_pMax_gene[<span class="fu">which</span>(rho_pMax_gene<span class="sc">&lt;</span>alpha <span class="sc">&amp;</span> adj_temp <span class="sc">==</span><span class="dv">0</span>)] <span class="ot">=</span> <span class="dv">1</span>  </span>
+<span id="cb41-14"><a href="#cb41-14" tabindex="-1"></a></span>
+<span id="cb41-15"><a href="#cb41-15" tabindex="-1"></a>rho_pMax_gene_outcome <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="sc">-</span><span class="fu">abs</span>(<span class="fu">as.numeric</span>(<span class="fu">as.vector</span>(<span class="fu">unlist</span>(gene_outcome_network<span class="sc">$</span>zMin))))) <span class="do">##convert zMin for gene-outcome causal network to pvalues</span></span>
+<span id="cb41-16"><a href="#cb41-16" tabindex="-1"></a>rho_pMax[<span class="dv">1</span><span class="sc">:</span>gene_num,<span class="dv">1</span><span class="sc">:</span>gene_num] <span class="ot">&lt;-</span> rho_pMax_gene <span class="co"># </span></span>
+<span id="cb41-17"><a href="#cb41-17" tabindex="-1"></a>rho_pMax[,rho_pMax_len] <span class="ot">&lt;-</span> <span class="fu">c</span>(rho_pMax_gene_outcome,<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb41-18"><a href="#cb41-18" tabindex="-1"></a>rho_pMax[rho_pMax_len,] <span class="ot">&lt;-</span> <span class="fu">c</span>(rho_pMax_gene_outcome,<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb41-19"><a href="#cb41-19" tabindex="-1"></a><span class="fu">diag</span>(rho_pMax) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb41-20"><a href="#cb41-20" tabindex="-1"></a>rho_pMax[rho_pMax<span class="sc">==-</span><span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb41-21"><a href="#cb41-21" tabindex="-1"></a></span>
+<span id="cb41-22"><a href="#cb41-22" tabindex="-1"></a>estimateMatrix <span class="ot">&lt;-</span> bgadd2  </span>
+<span id="cb41-23"><a href="#cb41-23" tabindex="-1"></a>estimateMatrix <span class="ot">&lt;-</span> <span class="fu">t</span>(estimateMatrix) <span class="do">## to make bgadd2 consistent with the graph derived from GTEx</span></span>
+<span id="cb41-24"><a href="#cb41-24" tabindex="-1"></a><span class="fu">rownames</span>(estimateMatrix) <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>,rho_pMax_len)</span>
+<span id="cb41-25"><a href="#cb41-25" tabindex="-1"></a><span class="fu">colnames</span>(estimateMatrix) <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>,rho_pMax_len)</span>
+<span id="cb41-26"><a href="#cb41-26" tabindex="-1"></a><span class="co"># Convert the combined graph as a grahNEL object</span></span>
+<span id="cb41-27"><a href="#cb41-27" tabindex="-1"></a>graph.fit <span class="ot">&lt;-</span> <span class="fu">as</span>(estimateMatrix, <span class="st">&quot;graphNEL&quot;</span>)</span>
+<span id="cb41-28"><a href="#cb41-28" tabindex="-1"></a><span class="co">#convert format of the graph that have negative edges</span></span>
+<span id="cb41-29"><a href="#cb41-29" tabindex="-1"></a>estimateGraph <span class="ot">&lt;-</span> <span class="fu">graph.adjacency</span>(estimateMatrix, <span class="at">mode=</span><span class="st">&quot;directed&quot;</span>, <span class="at">weighted=</span><span class="cn">TRUE</span>)</span>
+<span id="cb41-30"><a href="#cb41-30" tabindex="-1"></a>estimateGraph <span class="ot">&lt;-</span> <span class="fu">igraph.to.graphNEL</span>(estimateGraph)</span>
+<span id="cb41-31"><a href="#cb41-31" tabindex="-1"></a>Effects_mat_final <span class="ot">&lt;-</span> <span class="fu">Get_IDA_and_jointIDA</span>(estimateGraph,cov_mat,target_genes)</span></code></pre></div>
+<pre><code>## The estimation for jointIDA is completed!
+## This is the estimation of IDA for the 1 variable.
+## This is the estimation of IDA for the 2 variable.
+## This is the estimation of IDA for the 3 variable.
+## This is the estimation of IDA for the 4 variable.
+## This is the estimation of IDA for the 5 variable.
+## This is the estimation of IDA for the 6 variable.
+## This is the estimation of IDA for the 7 variable.
+## This is the estimation of IDA for the 8 variable.
+## This is the estimation of IDA for the 9 variable.
+## This is the estimation of IDA for the 10 variable.
+## This is the estimation of IDA for the 11 variable.
+## This is the estimation of IDA for the 12 variable.
+## This is the estimation of IDA for the 13 variable.
+## This is the estimation of IDA for the 14 variable.
+## This is the estimation of IDA for the 15 variable.
+## This is the estimation of IDA for the 16 variable.
+## This is the estimation of IDA for the 17 variable.
+## This is the estimation of IDA for the 18 variable.
+## This is the estimation of IDA for the 19 variable.
+## This is the estimation of IDA for the 20 variable.
+## This is the estimation of IDA for the 21 variable.
+## This is the estimation of IDA for the 22 variable.
+## This is the estimation of IDA for the 23 variable.
+## This is the estimation of IDA for the 24 variable.
+## This is the estimation of IDA for the 25 variable.
+## This is the estimation of IDA for the 26 variable.
+## This is the estimation of IDA for the 27 variable.
+## This is the estimation of IDA for the 28 variable.
+## This is the estimation of IDA for the 29 variable.
+## This is the estimation of IDA for the 30 variable.
+## This is the estimation of IDA for the 31 variable.
+## This is the estimation of IDA for the 32 variable.
+## This is the estimation of IDA for the 33 variable.
+## This is the estimation of IDA for the 34 variable.
+## This is the estimation of IDA for the 35 variable.
+## This is the estimation of IDA for the 36 variable.
+## This is the estimation of IDA for the 37 variable.
+## This is the estimation of IDA for the 38 variable.
+## This is the estimation of IDA for the 39 variable.
+## This is the estimation of IDA for the 40 variable.
+## This is the estimation of IDA for the 41 variable.
+## This is the estimation of IDA for the 42 variable.
+## This is the estimation of IDA for the 43 variable.
+## This is the estimation of IDA for the 44 variable.
+## This is the estimation of IDA for the 45 variable.
+## This is the estimation of IDA for the 46 variable.
+## This is the estimation of IDA for the 47 variable.
+## This is the estimation of IDA for the 48 variable.
+## This is the estimation of IDA for the 49 variable.
+## This is the estimation of IDA for the 50 variable.
+## This is the estimation of IDA for the 51 variable.
+## This is the estimation of IDA for the 52 variable.
+## This is the estimation of IDA for the 53 variable.
+## This is the estimation of IDA for the 54 variable.
+## This is the estimation of IDA for the 55 variable.
+## This is the estimation of IDA for the 56 variable.
+## This is the estimation of IDA for the 57 variable.
+## This is the estimation of IDA for the 58 variable.
+## This is the estimation of IDA for the 59 variable.
+## This is the estimation of IDA for the 60 variable.
+## This is the estimation of IDA for the 61 variable.
+## This is the estimation of IDA for the 62 variable.
+## This is the estimation of IDA for the 63 variable.
+## This is the estimation of IDA for the 64 variable.
+## This is the estimation of IDA for the 65 variable.
+## This is the estimation of IDA for the 66 variable.
+## This is the estimation of IDA for the 67 variable.
+## This is the estimation of IDA for the 68 variable.
+## This is the estimation of IDA for the 69 variable.
+## This is the estimation of IDA for the 70 variable.
+## This is the estimation of IDA for the 71 variable.
+## This is the estimation of IDA for the 72 variable.
+## This is the estimation of IDA for the 73 variable.
+## This is the estimation of IDA for the 74 variable.
+## This is the estimation of IDA for the 75 variable.
+## This is the estimation of IDA for the 76 variable.
+## This is the estimation of IDA for the 77 variable.
+## This is the estimation of IDA for the 78 variable.
+## This is the estimation of IDA for the 79 variable.
+## This is the estimation of IDA for the 80 variable.
+## This is the estimation of IDA for the 81 variable.
+## This is the estimation of IDA for the 82 variable.
+## This is the estimation of IDA for the 83 variable.
+## This is the estimation of IDA for the 84 variable.
+## This is the estimation of IDA for the 85 variable.
+## This is the estimation of IDA for the 86 variable.
+## This is the estimation of IDA for the 87 variable.
+## This is the estimation of IDA for the 88 variable.
+## This is the estimation of IDA for the 89 variable.
+## This is the estimation of IDA for the 90 variable.
+## This is the estimation of IDA for the 91 variable.
+## This is the estimation of IDA for the 92 variable.
+## This is the estimation of IDA for the 93 variable.
+## This is the estimation of IDA for the 94 variable.
+## This is the estimation of IDA for the 95 variable.
+## This is the estimation of IDA for the 96 variable.
+## This is the estimation of IDA for the 97 variable.
+## This is the estimation of IDA for the 98 variable.
+## This is the estimation of IDA for the 99 variable.
+## This is the estimation of IDA for the 100 variable.
+## This is the estimation of IDA for the 101 variable.
+## This is the estimation of IDA for the 102 variable.
+## This is the estimation of IDA for the 103 variable.
+## This is the estimation of IDA for the 104 variable.
+## This is the estimation of IDA for the 105 variable.
+## This is the estimation of IDA for the 106 variable.
+## This is the estimation of IDA for the 107 variable.
+## This is the estimation of IDA for the 108 variable.
+## This is the estimation of IDA for the 109 variable.
+## This is the estimation of IDA for the 110 variable.
+## This is the estimation of IDA for the 111 variable.
+## This is the estimation of IDA for the 112 variable.
+## This is the estimation of IDA for the 113 variable.
+## This is the estimation of IDA for the 114 variable.
+## This is the estimation of IDA for the 115 variable.
+## This is the estimation of IDA for the 116 variable.
+## This is the estimation of IDA for the 117 variable.
+## This is the estimation of IDA for the 118 variable.
+## This is the estimation of IDA for the 119 variable.
+## This is the estimation of IDA for the 120 variable.
+## This is the estimation of IDA for the 121 variable.
+## This is the estimation of IDA for the 122 variable.
+## This is the estimation of IDA for the 123 variable.
+## This is the estimation of IDA for the 124 variable.
+## This is the estimation of IDA for the 125 variable.
+## This is the estimation of IDA for the 126 variable.
+## This is the estimation of IDA for the 127 variable.
+## This is the estimation of IDA for the 128 variable.
+## This is the estimation of IDA for the 129 variable.
+## This is the estimation of IDA for the 130 variable.
+## This is the estimation of IDA for the 131 variable.
+## This is the estimation of IDA for the 132 variable.
+## This is the estimation of IDA for the 133 variable.
+## This is the estimation of IDA for the 134 variable.
+## This is the estimation of IDA for the 135 variable.
+## This is the estimation of IDA for the 136 variable.
+## This is the estimation of IDA for the 137 variable.
+## This is the estimation of IDA for the 138 variable.
+## This is the estimation of IDA for the 139 variable.
+## This is the estimation of IDA for the 140 variable.
+## This is the estimation of IDA for the 141 variable.
+## This is the estimation of IDA for the 142 variable.
+## This is the estimation of IDA for the 143 variable.
+## This is the estimation of IDA for the 144 variable.
+## This is the estimation of IDA for the 145 variable.
+## This is the estimation of IDA for the 146 variable.
+## This is the estimation of IDA for the 147 variable.
+## This is the estimation of IDA for the 148 variable.
+## This is the estimation of IDA for the 149 variable.
+## The estimation for IDA is completed!</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a>cov_adjusted <span class="ot">&lt;-</span> <span class="fu">get_pvalue_adjusted_cov</span>(rho_pMax,cov_mat)</span>
+<span id="cb43-2"><a href="#cb43-2" tabindex="-1"></a>Effects_mat_pval_adjusted_final <span class="ot">&lt;-</span> <span class="fu">Get_IDA_and_jointIDA</span>(estimateGraph,cov_adjusted,target_genes)</span></code></pre></div>
+<pre><code>## The estimation for jointIDA is completed!
+## This is the estimation of IDA for the 1 variable.
+## This is the estimation of IDA for the 2 variable.
+## This is the estimation of IDA for the 3 variable.
+## This is the estimation of IDA for the 4 variable.
+## This is the estimation of IDA for the 5 variable.
+## This is the estimation of IDA for the 6 variable.
+## This is the estimation of IDA for the 7 variable.
+## This is the estimation of IDA for the 8 variable.
+## This is the estimation of IDA for the 9 variable.
+## This is the estimation of IDA for the 10 variable.
+## This is the estimation of IDA for the 11 variable.
+## This is the estimation of IDA for the 12 variable.
+## This is the estimation of IDA for the 13 variable.
+## This is the estimation of IDA for the 14 variable.
+## This is the estimation of IDA for the 15 variable.
+## This is the estimation of IDA for the 16 variable.
+## This is the estimation of IDA for the 17 variable.
+## This is the estimation of IDA for the 18 variable.
+## This is the estimation of IDA for the 19 variable.
+## This is the estimation of IDA for the 20 variable.
+## This is the estimation of IDA for the 21 variable.
+## This is the estimation of IDA for the 22 variable.
+## This is the estimation of IDA for the 23 variable.
+## This is the estimation of IDA for the 24 variable.
+## This is the estimation of IDA for the 25 variable.
+## This is the estimation of IDA for the 26 variable.
+## This is the estimation of IDA for the 27 variable.
+## This is the estimation of IDA for the 28 variable.
+## This is the estimation of IDA for the 29 variable.
+## This is the estimation of IDA for the 30 variable.
+## This is the estimation of IDA for the 31 variable.
+## This is the estimation of IDA for the 32 variable.
+## This is the estimation of IDA for the 33 variable.
+## This is the estimation of IDA for the 34 variable.
+## This is the estimation of IDA for the 35 variable.
+## This is the estimation of IDA for the 36 variable.
+## This is the estimation of IDA for the 37 variable.
+## This is the estimation of IDA for the 38 variable.
+## This is the estimation of IDA for the 39 variable.
+## This is the estimation of IDA for the 40 variable.
+## This is the estimation of IDA for the 41 variable.
+## This is the estimation of IDA for the 42 variable.
+## This is the estimation of IDA for the 43 variable.
+## This is the estimation of IDA for the 44 variable.
+## This is the estimation of IDA for the 45 variable.
+## This is the estimation of IDA for the 46 variable.
+## This is the estimation of IDA for the 47 variable.
+## This is the estimation of IDA for the 48 variable.
+## This is the estimation of IDA for the 49 variable.
+## This is the estimation of IDA for the 50 variable.
+## This is the estimation of IDA for the 51 variable.
+## This is the estimation of IDA for the 52 variable.
+## This is the estimation of IDA for the 53 variable.
+## This is the estimation of IDA for the 54 variable.
+## This is the estimation of IDA for the 55 variable.
+## This is the estimation of IDA for the 56 variable.
+## This is the estimation of IDA for the 57 variable.
+## This is the estimation of IDA for the 58 variable.
+## This is the estimation of IDA for the 59 variable.
+## This is the estimation of IDA for the 60 variable.
+## This is the estimation of IDA for the 61 variable.
+## This is the estimation of IDA for the 62 variable.
+## This is the estimation of IDA for the 63 variable.
+## This is the estimation of IDA for the 64 variable.
+## This is the estimation of IDA for the 65 variable.
+## This is the estimation of IDA for the 66 variable.
+## This is the estimation of IDA for the 67 variable.
+## This is the estimation of IDA for the 68 variable.
+## This is the estimation of IDA for the 69 variable.
+## This is the estimation of IDA for the 70 variable.
+## This is the estimation of IDA for the 71 variable.
+## This is the estimation of IDA for the 72 variable.
+## This is the estimation of IDA for the 73 variable.
+## This is the estimation of IDA for the 74 variable.
+## This is the estimation of IDA for the 75 variable.
+## This is the estimation of IDA for the 76 variable.
+## This is the estimation of IDA for the 77 variable.
+## This is the estimation of IDA for the 78 variable.
+## This is the estimation of IDA for the 79 variable.
+## This is the estimation of IDA for the 80 variable.
+## This is the estimation of IDA for the 81 variable.
+## This is the estimation of IDA for the 82 variable.
+## This is the estimation of IDA for the 83 variable.
+## This is the estimation of IDA for the 84 variable.
+## This is the estimation of IDA for the 85 variable.
+## This is the estimation of IDA for the 86 variable.
+## This is the estimation of IDA for the 87 variable.
+## This is the estimation of IDA for the 88 variable.
+## This is the estimation of IDA for the 89 variable.
+## This is the estimation of IDA for the 90 variable.
+## This is the estimation of IDA for the 91 variable.
+## This is the estimation of IDA for the 92 variable.
+## This is the estimation of IDA for the 93 variable.
+## This is the estimation of IDA for the 94 variable.
+## This is the estimation of IDA for the 95 variable.
+## This is the estimation of IDA for the 96 variable.
+## This is the estimation of IDA for the 97 variable.
+## This is the estimation of IDA for the 98 variable.
+## This is the estimation of IDA for the 99 variable.
+## This is the estimation of IDA for the 100 variable.
+## This is the estimation of IDA for the 101 variable.
+## This is the estimation of IDA for the 102 variable.
+## This is the estimation of IDA for the 103 variable.
+## This is the estimation of IDA for the 104 variable.
+## This is the estimation of IDA for the 105 variable.
+## This is the estimation of IDA for the 106 variable.
+## This is the estimation of IDA for the 107 variable.
+## This is the estimation of IDA for the 108 variable.
+## This is the estimation of IDA for the 109 variable.
+## This is the estimation of IDA for the 110 variable.
+## This is the estimation of IDA for the 111 variable.
+## This is the estimation of IDA for the 112 variable.
+## This is the estimation of IDA for the 113 variable.
+## This is the estimation of IDA for the 114 variable.
+## This is the estimation of IDA for the 115 variable.
+## This is the estimation of IDA for the 116 variable.
+## This is the estimation of IDA for the 117 variable.
+## This is the estimation of IDA for the 118 variable.
+## This is the estimation of IDA for the 119 variable.
+## This is the estimation of IDA for the 120 variable.
+## This is the estimation of IDA for the 121 variable.
+## This is the estimation of IDA for the 122 variable.
+## This is the estimation of IDA for the 123 variable.
+## This is the estimation of IDA for the 124 variable.
+## This is the estimation of IDA for the 125 variable.
+## This is the estimation of IDA for the 126 variable.
+## This is the estimation of IDA for the 127 variable.
+## This is the estimation of IDA for the 128 variable.
+## This is the estimation of IDA for the 129 variable.
+## This is the estimation of IDA for the 130 variable.
+## This is the estimation of IDA for the 131 variable.
+## This is the estimation of IDA for the 132 variable.
+## This is the estimation of IDA for the 133 variable.
+## This is the estimation of IDA for the 134 variable.
+## This is the estimation of IDA for the 135 variable.
+## This is the estimation of IDA for the 136 variable.
+## This is the estimation of IDA for the 137 variable.
+## This is the estimation of IDA for the 138 variable.
+## This is the estimation of IDA for the 139 variable.
+## This is the estimation of IDA for the 140 variable.
+## This is the estimation of IDA for the 141 variable.
+## This is the estimation of IDA for the 142 variable.
+## This is the estimation of IDA for the 143 variable.
+## This is the estimation of IDA for the 144 variable.
+## This is the estimation of IDA for the 145 variable.
+## This is the estimation of IDA for the 146 variable.
+## This is the estimation of IDA for the 147 variable.
+## This is the estimation of IDA for the 148 variable.
+## This is the estimation of IDA for the 149 variable.
+## The estimation for IDA is completed!</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a>iterateNum <span class="ot">&lt;-</span><span class="dv">20</span> <span class="co"># maximum iteration number</span></span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>thres <span class="ot">&lt;-</span> <span class="fl">1e-04</span> <span class="co"># threshold used to determine whether the penalizaiton converged</span></span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(gene_trait_valid)</span>
+<span id="cb45-4"><a href="#cb45-4" tabindex="-1"></a>cov_iterative_adjust <span class="ot">&lt;-</span> <span class="fu">get_iterative_pvalue_adjusted_cov</span>(rho_pMax,cov_mat,iterateNum,thres,n)</span>
+<span id="cb45-5"><a href="#cb45-5" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Finished merging the gene-gene and gene-outcome causal network&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;Finished merging the gene-gene and gene-outcome causal network&quot;</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+Package: BNGWAS
+Version: 1.0
+Date: 2023-11-01
+Title: Bayesian Network GWAS
+Description: This package provides comparably efficient procedures to infer the whole causal graph and estimate the total and direct causal effects from different data sources. 
+Depends: 
+    R (>= 4.0),
+    glassoFast,
+    glasso,
+    dplyr,
+    igraph,
+    graph,
+    coop,
+    Matrix,
+    pcalg,
+    parallel
+Suggests: 
+    knitr, 
+    rmarkdown
+VignetteBuilder: knitr
+Author: Liangyin Yin <yinliangying@gmail.com>,
+        Feng Yaning <fengyaningjy@126.com>,
+        So Hon-cheong <hcso85@gmail.com>
+Maintainer: Liangyin Yin <yinliangying@gmail.com>,
+            Feng Yaning <fengyaningjy@126.com>,
+            Shi Yujia <yj.shi@outlook.com>,
+            So Hon-cheong <hcso85@gmail.com>
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.2.3

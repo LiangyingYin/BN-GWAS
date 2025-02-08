@@ -15,7 +15,8 @@ BiocGenerics = 0.48.0
 igraph = 1.5.1        
 dplyr = 1.1.3          
 glasso = 1.11          
-glassoFast = 1.0.1  
+glassoFast = 1.0.1 
+BH =1.84.0.0
 
 In addition, We strongly recommend you to install the pcalg we provided in the Github repository, as we have revise some of the functions provided in the orignal package.
 
